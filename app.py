@@ -61,11 +61,15 @@ def home():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    USER_NAME = os.getenv("USER_NAME")
+    USER_PASSWORD = os.getenv("USER_PASSWORD")
+    ADMIN_NAME = os.getenv("ADMIN_NAME")
+    ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
+
     if request.method == 'POST':
         user = request.form.get('username')
         pw = request.form.get('password')
 
-        # DEBUG (temporary – helps you see values in Railway logs)
         print("Entered:", user, pw)
         print("User ENV:", USER_NAME, USER_PASSWORD)
         print("Admin ENV:", ADMIN_NAME, ADMIN_PASSWORD)

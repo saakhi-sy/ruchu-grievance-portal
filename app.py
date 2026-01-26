@@ -1,3 +1,5 @@
+
+    
 from flask import Flask, render_template, request, redirect, session, url_for, flash
 from flask_mail import Mail, Message
 import sqlite3
@@ -58,26 +60,20 @@ def login_required(role):
 def home():
     return render_template('home.html', user_display_name=USER_NAME)
 
-
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        user = request.form.get('username')
-        pw = request.form.get('password')
-
-        if user == os.environ.get("USER_NAME") and pw == os.environ.get("USER_PASSWORD"):
-            session['role'] = 'user'
+        user = request.form['username']
+        pw = request.form['password']
+        if user == USER_NAME and pw == USER_PASSWORD:
+            session['user'] = USER_NAME
             return redirect(url_for('submit'))
-
-        if user == os.environ.get("ADMIN_NAME") and pw == os.environ.get("ADMIN_PASSWORD"):
-            session['role'] = 'admin'
+        elif user == ADMIN_NAME and pw == ADMIN_PASSWORD:
+            session['user'] = ADMIN_NAME
             return redirect(url_for('dashboard'))
-
-        flash('Invalid credentials')
-
-    return render_template('login.html')
-
-        
+        else:
+            flash('Invalid credentials')
+    return render_template('login.html', user_display_name=USER_NAME)
 
 @app.route('/logout')
 def logout():

@@ -61,17 +61,25 @@ def home():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        user = request.form['username']
-        pw = request.form['password']
+        user = request.form.get('username')
+        pw = request.form.get('password')
+
+        # DEBUG (temporary – helps you see values in Railway logs)
+        print("Entered:", user, pw)
+        print("User ENV:", USER_NAME, USER_PASSWORD)
+        print("Admin ENV:", ADMIN_NAME, ADMIN_PASSWORD)
+
         if user == USER_NAME and pw == USER_PASSWORD:
             session['user'] = USER_NAME
             return redirect(url_for('submit'))
-        elif user == ADMIN_NAME and pw == ADMIN_PASSWORD:
+
+        if user == ADMIN_NAME and pw == ADMIN_PASSWORD:
             session['user'] = ADMIN_NAME
             return redirect(url_for('dashboard'))
-        else:
-            flash('Invalid credentials')
-    return render_template('login.html', user_display_name=USER_NAME)
+
+        flash('Invalid credentials')
+
+    return render_template('login.html')
 
 @app.route('/logout')
 def logout():

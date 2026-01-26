@@ -61,30 +61,22 @@ def home():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    USER_NAME = os.getenv("USER_NAME")
-    USER_PASSWORD = os.getenv("USER_PASSWORD")
-    ADMIN_NAME = os.getenv("ADMIN_NAME")
-    ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD")
-
     if request.method == 'POST':
         user = request.form.get('username')
         pw = request.form.get('password')
 
-        print("Entered:", user, pw)
-        print("User ENV:", USER_NAME, USER_PASSWORD)
-        print("Admin ENV:", ADMIN_NAME, ADMIN_PASSWORD)
-
-        if user == USER_NAME and pw == USER_PASSWORD:
-            session['user'] = USER_NAME
+        if user == os.environ.get("USER_NAME") and pw == os.environ.get("USER_PASSWORD"):
+            session['role'] = 'user'
             return redirect(url_for('submit'))
 
-        if user == ADMIN_NAME and pw == ADMIN_PASSWORD:
-            session['user'] = ADMIN_NAME
+        if user == os.environ.get("ADMIN_NAME") and pw == os.environ.get("ADMIN_PASSWORD"):
+            session['role'] = 'admin'
             return redirect(url_for('dashboard'))
 
         flash('Invalid credentials')
 
     return render_template('login.html')
+
         
 
 @app.route('/logout')
@@ -204,7 +196,7 @@ def respond(gid):
     return redirect(url_for('dashboard'))
 
 @app.route('/dashboard')
-@login_required(ADMIN_NAME)
+@login_required('admin')
 def dashboard():
     with sqlite3.connect('grievances.db') as conn:
         c = conn.cursor()
@@ -213,7 +205,7 @@ def dashboard():
     return render_template('dashboard.html', grievances=data)
 
 @app.route('/resolve/<int:gid>')
-@login_required(ADMIN_NAME)
+@login_required('admin')
 def resolve(gid):
     with sqlite3.connect('grievances.db') as conn:
         c = conn.cursor()

@@ -58,6 +58,7 @@ def login_required(role):
 def home():
     return render_template('home.html', user_display_name=USER_NAME)
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -80,6 +81,7 @@ def login():
         flash('Invalid credentials')
 
     return render_template('login.html')
+        
 
 @app.route('/logout')
 def logout():

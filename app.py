@@ -196,7 +196,7 @@ def respond(gid):
     return redirect(url_for('dashboard'))
 
 @app.route('/dashboard')
-@login_required('admin')
+@login_required(ADMIN_NAME)
 def dashboard():
     with sqlite3.connect('grievances.db') as conn:
         c = conn.cursor()
@@ -205,7 +205,7 @@ def dashboard():
     return render_template('dashboard.html', grievances=data)
 
 @app.route('/resolve/<int:gid>')
-@login_required('admin')
+@login_required(ADMIN_NAME)
 def resolve(gid):
     with sqlite3.connect('grievances.db') as conn:
         c = conn.cursor()

@@ -81,8 +81,35 @@ def logout():
     return redirect(url_for('home'))
 
 @app.route('/submit', methods=['GET', 'POST'])
+@login_required(USER_NAME)
 def submit():
-    return redirect(url_for('thank_you'))
+    if request.method == 'POST':
+        title = request.form['title']
+        desc = request.form['description']
+        mood = request.form['mood']
+        priority = request.form['priority']
+
+        with sqlite3.connect('grievances.db') as conn:
+            c = conn.cursor()
+            c.execute(
+                "INSERT INTO grievances (title, description, mood, priority) VALUES (?, ?, ?, ?)",
+                (title, desc, mood, priority)
+            )
+            conn.commit()
+
+        # 🔕 MAIL TEMPORARILY DISABLED
+        # msg = Message(
+        #     f"New Grievance from {USER_NAME} 💌",
+        #     sender=os.environ.get('EMAIL_ADMIN'),
+        #     recipients=[os.environ.get('EMAIL_ADMIN')]
+        # )
+        # msg.html = """ ... """
+        # mail.send(msg)
+
+        flash(f'Grievance submitted! {ADMIN_NAME} has been notified 💌')
+        return redirect(url_for('thank_you'))
+
+    return render_template('submit.html')
 
 @app.route('/thankyou')
 @login_required(USER_NAME)

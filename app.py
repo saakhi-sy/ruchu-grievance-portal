@@ -80,7 +80,7 @@ def logout():
     session.pop('user', None)
     return redirect(url_for('home'))
 
-@app.route('/submit', methods=['POST'])
+@app.route('/submit', methods=['GET', 'POST'])
 def submit():
     return redirect(url_for('thank_you'))
 

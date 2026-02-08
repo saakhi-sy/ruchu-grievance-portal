@@ -80,82 +80,9 @@ def logout():
     session.pop('user', None)
     return redirect(url_for('home'))
 
-@app.route('/submit', methods=['GET', 'POST'])
-@login_required(USER_NAME)
+@app.route('/submit', methods=['POST'])
 def submit():
-    if request.method == 'POST':
-        title = request.form['title']
-        desc = request.form['description']
-        mood = request.form['mood']
-        priority = request.form['priority']
-        with sqlite3.connect('grievances.db') as conn:
-            c = conn.cursor()
-            c.execute("INSERT INTO grievances (title, description, mood, priority) VALUES (?, ?, ?, ?)",
-                      (title, desc, mood, priority))
-            conn.commit()
-            grievance_id = c.lastrowid
-
-        msg = Message("New Grievance from {} 💌".format(USER_NAME),
-                      sender=os.environ.get('EMAIL_ADMIN'),
-                      recipients=[os.environ.get('EMAIL_ADMIN')])
-        msg.html = f"""
-            <h3>New Grievance Submitted 💌</h3>
-            <p><strong>Title:</strong> {title}</p>
-            <p><strong>Mood:</strong> {mood}</p>
-            <p><strong>Priority:</strong> {priority}</p>
-            <p><strong>Description:</strong><br>{desc}</p>
-            <hr>
-            <p>Click below to respond:</p>
-            <form action="https://sehaj-grievance-portal.up.railway.app/login" method="GET">
-                <button type="submit" style="padding: 10px; background-color: pink; border: none; border-radius: 5px;">Respond 💌</button>
-            </form>
-        """
-        mail.send(msg)
-
-        flash('Grievance submitted! {} has been notified 💌'.format(ADMIN_NAME))
-        return redirect(url_for('thank_you'))
-
-    return render_template('submit.html')
-
-def send_email_to_user(grievance_id, response):
-    with sqlite3.connect('grievances.db') as conn:
-        c = conn.cursor()
-        c.execute("SELECT title, priority, resolved FROM grievances WHERE id = ?", (grievance_id,))
-        result = c.fetchone()
-
-    if result:
-        title, priority, resolved = result
-        status = "Resolved ✅" if resolved == 1 else "Pending ❌"
-
-        # Create the email message
-        msg = Message("Grievance Response Received - Re: {}".format(title),
-                    recipients=[os.environ.get('EMAIL_USER_RECEIVER')])
-
-        msg.html = f"""
-        <html>
-            <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; color: #333;">
-                <div style="background-color: #fff; padding: 20px; border-radius: 8px; width: 600px; margin: auto; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);">
-                    <h2 style="color: #4CAF50;">Grievance Response Received</h2>
-                    <p><strong>Title:</strong> {title}</p>
-                    <p><strong>Priority:</strong> {priority}</p>
-                    <p><strong>Status:</strong> {status}</p>
-                    <hr>
-                    <p><strong>Your Response:</strong></p>
-                    <p style="background-color: #f9f9f9; padding: 10px; border-left: 4px solid #4CAF50; font-style: italic;">
-                        {response}
-                    </p>
-                    <br>
-                    <p style="color: #888;">This is an automated message from the Grievance Portal. Please do not reply.</p>
-                </div>
-            </body>
-        </html>
-        """
-
-        try:
-            mail.send(msg)
-        except Exception as e:
-            print(f"Error sending email: {e}")
-            return redirect(url_for('thank_you'))
+    return redirect(url_for('thank_you'))
 
 @app.route('/thankyou')
 @login_required(USER_NAME)

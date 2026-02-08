@@ -155,6 +155,7 @@ def send_email_to_user(grievance_id, response):
             mail.send(msg)
         except Exception as e:
             print(f"Error sending email: {e}")
+            return redirect(url_for('thank_you'))
 
 @app.route('/thankyou')
 @login_required(USER_NAME)
